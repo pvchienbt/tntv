@@ -8,31 +8,31 @@
     <style>
         .question-nav-btn.active { border: 3px solid #ef4444; }
         .question-nav-btn.answered { background-color: #22c55e !important; color: white; }
-        .drop-zone { min-height: 55px; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 8px; margin-top: 8px; background: #f8fafc; transition: all 0.3s; }
+        .drop-zone { min-height: 55px; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 8px; margin-top: 8px; background: #f8fafc; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
         .drag-item { cursor: grab; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: 500; }
         .drag-item:active { cursor: grabbing; }
         .hidden-screen { display: none !important; }
-        .inline-input { display: inline-block; width: 100px; padding: 2px 8px; border-bottom: 2px solid #3b82f6; outline: none; text-align: center; font-weight: bold; color: #1e40af; background: #f1f5f9; border-radius: 4px; transition: all 0.2s; margin: 0 2px; }
+        .inline-input { display: inline-block; width: 110px; padding: 2px 8px; border-bottom: 2px solid #3b82f6; outline: none; text-align: center; font-weight: bold; color: #1e40af; background: #f1f5f9; border-radius: 4px; transition: all 0.2s; margin: 0 2px; }
         .inline-input:focus { background-color: #dbeafe; border-bottom-color: #1d4ed8; transform: translateY(-1px); }
-        .question-text { line-height: 2.4; font-size: 1.15rem; }
-        .error-label { font-size: 0.8rem; font-weight: 800; color: #dc2626; text-transform: uppercase; margin-bottom: 6px; display: block; }
+        .question-text { line-height: 2.4; font-size: 1.15rem; text-align: left; }
+        .error-label { font-size: 0.8rem; font-weight: 800; color: #dc2626; text-transform: uppercase; margin-bottom: 6px; display: block; text-align: left; }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800">
 
 <div id="app" class="max-w-6xl mx-auto p-4 min-h-screen">
-    <!-- Login Screen -->
+    <!-- Màn hình Đăng nhập -->
     <div id="login-screen" class="flex flex-col items-center justify-center mt-20 bg-white p-10 rounded-2xl shadow-xl max-w-md mx-auto border border-slate-200">
         <h1 class="text-2xl font-bold text-blue-800 mb-8 text-center uppercase tracking-tight">Thi thử TNTV cấp Tỉnh năm 2026</h1>
-        <div class="w-full mb-6">
+        <div class="w-full mb-6 text-left">
             <label class="block text-sm font-semibold mb-2 text-slate-600">Số báo danh của em:</label>
-            <input type="text" id="student-id" class="w-full p-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition" placeholder="SBD gồm 8 số">
+            <input type="text" id="student-id" class="w-full p-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition" placeholder="Số báo danh gồm 8 số">
         </div>
-        <button onclick="window.handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Đăng nhập hệ thống</button>
-        <p id="login-error" class="text-red-500 text-sm mt-4 hidden font-medium text-center">⚠️ Số báo danh không chính xác! (nhập ngày tháng năm sinh theo định dạng ddmmyyyy</p>
+        <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition uppercase">Đăng nhập hệ thống</button>
+        <p id="login-error" class="text-red-500 text-sm mt-4 hidden font-medium text-center">⚠️ Số báo danh không chính xác! (8 số theo ngày tháng năm sinh)</p>
     </div>
 
-    <!-- Ready Screen -->
+    <!-- Màn hình Sẵn sàng -->
     <div id="ready-screen" class="hidden-screen flex flex-col items-center justify-center mt-20 bg-white p-10 rounded-2xl shadow-xl max-w-md mx-auto border border-slate-200">
         <h2 id="welcome-msg" class="text-2xl font-bold mb-4 text-center text-blue-900"></h2>
         <div class="mb-8 p-5 bg-blue-50 rounded-xl text-center text-slate-700 space-y-2 w-full">
@@ -40,57 +40,57 @@
             <p>Thời gian làm bài: <b>30 phút</b></p>
             <p>Điểm tối đa: <b>300 điểm</b></p>
         </div>
-        <p class="mb-8 text-xl font-bold text-slate-800 text-center">Em đã sẵn sàng chưa?</p>
+        <p class="mb-8 text-xl font-bold text-slate-800 text-center uppercase tracking-wide">Em đã sẵn sàng chưa?</p>
         <div class="flex gap-4 w-full">
-            <button onclick="window.startExam()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Em sẵn sàng</button>
-            <button onclick="location.reload()" class="flex-1 bg-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-300 transition">Em chưa sẵn sàng</button>
+            <button onclick="startExam()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Em sẵn sàng</button>
+            <button onclick="location.reload()" class="flex-1 bg-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-300 transition">Chưa sẵn sàng</button>
         </div>
     </div>
 
-    <!-- Exam Screen -->
+    <!-- Màn hình Thi chính thức -->
     <div id="exam-screen" class="hidden-screen">
         <header class="flex flex-wrap justify-between items-center bg-white p-5 rounded-2xl shadow-md mb-6 sticky top-0 z-20 border-b-4 border-blue-600">
-            <div>
+            <div class="text-left">
                 <h1 class="text-xl font-black text-blue-800 tracking-tight uppercase">TNTV Cấp Tỉnh 2026</h1>
-                <p class="text-sm font-medium">Học sinh: <span id="display-name" class="text-green-600 font-bold"></span></p>
+                <p class="text-sm font-medium text-left">Học sinh: <span id="display-name" class="text-green-600 font-bold"></span></p>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-3xl font-mono font-black text-red-600 bg-red-50 px-5 py-2 rounded-xl border border-red-200" id="timer">30:00</div>
-                <button onclick="window.confirmSubmit()" class="bg-blue-600 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:bg-blue-700 transition">Nộp bài</button>
+                <button onclick="confirmSubmit()" class="bg-blue-600 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:bg-blue-700 transition">Nộp bài</button>
             </div>
         </header>
 
         <div class="flex flex-col lg:flex-row gap-8">
             <div class="flex-1">
-                <div id="question-area" class="bg-white p-8 rounded-3xl shadow-sm min-h-[500px] border border-slate-200">
+                <div id="question-area" class="bg-white p-8 rounded-3xl shadow-sm min-h-[500px] border border-slate-200 text-left">
                     <div id="question-container"></div>
                 </div>
                 <div class="flex justify-between mt-8">
-                    <button id="prev-btn" onclick="window.navQuestion(-1)" class="bg-white border-2 border-slate-200 px-10 py-3 rounded-2xl font-bold hover:bg-slate-50 disabled:opacity-30 transition">Câu trước</button>
-                    <button id="next-btn" onclick="window.navQuestion(1)" class="bg-white border-2 border-slate-200 px-10 py-3 rounded-2xl font-bold hover:bg-slate-50 disabled:opacity-30 transition">Câu tiếp theo</button>
+                    <button id="prev-btn" onclick="navQuestion(-1)" class="bg-white border-2 border-slate-200 px-10 py-3 rounded-2xl font-bold hover:bg-slate-50 disabled:opacity-30 transition">Câu trước</button>
+                    <button id="next-btn" onclick="navQuestion(1)" class="bg-white border-2 border-slate-200 px-10 py-3 rounded-2xl font-bold hover:bg-slate-50 disabled:opacity-30 transition">Câu tiếp theo</button>
                 </div>
             </div>
             <div class="w-full lg:w-80">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 sticky top-32">
                     <h3 class="font-bold text-slate-500 mb-4 pb-2 border-b uppercase text-xs tracking-widest text-center">Danh sách câu hỏi</h3>
-                    <div id="question-nav" class="grid grid-cols-5 gap-3"></div>
+                    <div id="question-nav" class="grid grid-cols-5 gap-3 text-left"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Result Screen -->
+    <!-- Màn hình Kết quả -->
     <div id="result-screen" class="hidden-screen flex-col items-center">
-        <div class="bg-white p-12 rounded-[2.5rem] shadow-2xl text-center max-w-2xl w-full border-t-[12px] border-blue-600">
-            <h2 class="text-3xl font-black text-slate-800 mb-2 uppercase">Kết quả thi</h2>
+        <div class="bg-white p-12 rounded-[2.5rem] shadow-2xl text-center max-w-2xl w-full border-t-[12px] border-blue-600 mt-10">
+            <h2 class="text-3xl font-black text-slate-800 mb-2 uppercase">Kết quả bài thi</h2>
             <div class="text-8xl font-black text-blue-700 mb-6" id="final-score">0</div>
             <p id="result-summary" class="text-xl text-slate-600 mb-10 font-medium"></p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="window.showReview()" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 shadow-xl transition-all">Xem lại bài làm</button>
-                <button onclick="location.reload()" class="bg-slate-100 text-slate-700 px-10 py-4 rounded-2xl font-bold hover:bg-slate-200 transition">Thoát</button>
+                <button onclick="showReview()" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 shadow-xl transition-all uppercase">Xem lại bài làm</button>
+                <button onclick="location.reload()" class="bg-slate-100 text-slate-700 px-10 py-4 rounded-2xl font-bold hover:bg-slate-200 transition uppercase">Làm lại bài mới</button>
             </div>
             <div class="mt-12 text-left bg-slate-50 p-8 rounded-3xl border border-slate-200">
-                <h3 class="font-black text-slate-700 mb-5 border-b pb-2 text-sm uppercase">Lịch sử thi của em:</h3>
+                <h3 class="font-black text-slate-700 mb-5 border-b pb-2 text-sm uppercase">Lịch sử thi của em trên máy này:</h3>
                 <ul id="history-list" class="space-y-3"></ul>
             </div>
         </div>
@@ -98,47 +98,33 @@
 </div>
 
 <!-- Review Modal -->
-<div id="review-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] overflow-y-auto p-4 flex items-start justify-center">
+<div id="review-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] overflow-y-auto p-4 flex items-start justify-center text-left">
     <div class="bg-white w-full max-w-4xl rounded-[2rem] p-10 shadow-2xl my-10 relative">
-        <button onclick="window.closeReview()" class="absolute top-6 right-8 text-5xl font-light hover:text-red-500 transition">&times;</button>
-        <h2 class="text-3xl font-black mb-10 text-blue-900 border-b pb-4 text-center">Phân tích kết quả chi tiết</h2>
-        <div id="review-content" class="space-y-12 text-left"></div>
+        <button onclick="closeReview()" class="absolute top-6 right-8 text-5xl font-light hover:text-red-500 transition">&times;</button>
+        <h2 class="text-3xl font-black mb-10 text-blue-900 border-b pb-4 text-center uppercase tracking-tight">Phân tích kết quả chi tiết</h2>
+        <div id="review-content" class="space-y-12"></div>
+        <div class="mt-10 flex justify-center">
+            <button onclick="closeReview()" class="bg-slate-800 text-white px-12 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-black transition">Đóng bảng phân tích</button>
+        </div>
     </div>
 </div>
 
 <!-- Confirm Dialog -->
 <div id="confirm-dialog" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
     <div class="bg-white p-10 rounded-[2rem] max-w-md w-full shadow-2xl text-center">
-        <h3 class="text-2xl font-black text-slate-800 mb-4 tracking-tight">Nộp bài ngay?</h3>
-        <p class="text-slate-600 mb-8">Em hãy kiểm tra kỹ các đáp án trước khi nhấn nộp bài nhé!</p>
+        <h3 class="text-2xl font-black text-slate-800 mb-4 tracking-tight uppercase">Nộp bài ngay?</h3>
+        <p class="text-slate-600 mb-8 font-medium">Em hãy kiểm tra kỹ các đáp án trước khi nhấn nộp bài nhé!</p>
         <div class="flex flex-col gap-4">
-            <button onclick="window.submitExam()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200">Nộp bài ngay</button>
-            <button onclick="window.closeConfirm()" class="w-full bg-slate-100 text-slate-700 py-4 rounded-xl font-bold">Kiểm tra lại</button>
+            <button onclick="submitExam()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200 uppercase tracking-wide">Em đã kiểm tra kỹ và muốn nộp ngay</button>
+            <button onclick="closeConfirm()" class="w-full bg-slate-100 text-slate-700 py-4 rounded-xl font-bold uppercase tracking-wide hover:bg-slate-200 transition">Em muốn kiểm tra lại bài</button>
         </div>
     </div>
 </div>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-import { getFirestore, collection, addDoc, query, onSnapshot, doc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+<script>
+// --- TOÀN BỘ LOGIC ĐƯỢC ĐẶT TRONG SCRIPT THƯỜNG ĐỂ CHẠY ĐƯỢC Ở LOCAL ---
 
-// --- INITIALIZE FIREBASE ---
-let firebaseApp, firebaseDb, firebaseAuth;
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'tntv-2026-v8';
-
-try {
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-    if (firebaseConfig.apiKey) {
-        firebaseApp = initializeApp(firebaseConfig);
-        firebaseDb = getFirestore(firebaseApp);
-        firebaseAuth = getAuth(firebaseApp);
-    }
-} catch (e) {
-    console.error("Firebase Initialization skipped or failed", e);
-}
-
-// --- DATA CÂU HỎI ---
+// --- DỮ LIỆU CÂU HỎI ---
 const allQuestions = [
     { id: 1, type: "fill", q: "Điền “ch” hoặc “tr” vào chỗ trống để hoàn thành đoạn thơ sau: <br>“Hai ...a con bước đi trên cát Ánh mặt ...ời rực rỡ biển xanh Bóng ...a dài lênh khênh Bóng con ...òn ...ắc nịch.” (Hoàng Trung Thông)", ans: "ch, tr, ch, tr, ch" },
     { id: 2, type: "fill", q: "Điền “ch” hoặc “tr” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Dọc ngang biết mấy nẻo đường Thắm ...ang sử Việt, rạng ...ương anh hùng Bao nhiêu ...iến thắng lẫy lừng Làm nên Tổ quốc kiêu hùng hôm nay. (Nguyễn Lâm Thắng)", ans: "tr, ch, ch" },
@@ -159,7 +145,7 @@ const allQuestions = [
     { id: 17, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Vươn mình trong gió che đu Cây kham khổ vẫn hát ru lá cành. (Nguyễn Duy) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "che - tre" },
     { id: 18, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Anh em cùng mẹ khác cha Cũng như cây cọ xinh ra nhiều cành. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xinh - sinh" },
     { id: 19, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Rễ dừa bám sâu vào lòng đất Như dân làng bám trặt quê hương. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "trặt - chặt" },
-    { id: 20, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Đây con sông xuôi dòng nước chảy Bốn mùa xoi từng mảng mây trời. (Hoài Vũ) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xoi - soi" },
+    { id: 20, type: "error_fix", q: "Đây con sông xuôi dòng nước chảy Bốn mùa xoi từng mảng mây trời. (Hoài Vũ) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xoi - soi" },
     { id: 21, type: "error_fix", q: "Tìm nơi quần đảo khơi sa Có loài hoa nở như là không tên. (Nguyễn Đức Mậu) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "sa - xa" },
     { id: 22, type: "error_fix", q: "Câu hát căng buồm với gió khơi Đoàn thuyền trạy đua cùng mặt trời. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "trạy - chạy" },
     { id: 23, type: "error_fix", q: "Người ngắm trăng soi ngoài cửa xổ Trăng nhòm khe cửa ngắm nhà thơ. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xổ - sổ" },
@@ -173,8 +159,8 @@ const allQuestions = [
     { id: 31, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Yêu từng bờ ruộng, lối mòn <br>Đỏ tươi bông gạo, biếc rờn ngàn dâu <br>Yêu con sông mặt sóng xao <br>Dòng sông tuổi nhỏ rì rào ... (Theo Lê Anh Xuân)", ans: "hát ca" },
     { id: 32, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Tôi lớn lên đã thấy dừa trước ngõ <br>Dừa ru tôi giấc ngủ ... <br>Cứ mỗi chiều nghe dừa reo trước gió <br>Tôi hỏi nội tôi: “Dừa có tự bao giờ?” (Theo Lê Anh Xuân)", ans: "tuổi thơ" },
     { id: 33, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Rừng xa vọng tiếng chim gù, <br>Ngân nga tiếng suối, vi vu gió ngàn. <br>Mùa xuân đẫm lá ngụy trang, <br>Đường ra ... nở vàng hoa mai. (Theo Lê Anh Xuân)", ans: "tiền tuyến" },
-    { id: 34, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Ba lô nặng, súng cầm tay, <br>Đường xa biết mấy ... nhớ thương. <br>Giờ này mẹ ở quê hương, <br>Cũng chừng đang dõi theo đường ta đi. (Theo Lê Anh Xuân)", ans: "dặm dài" },
-    { id: 35, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Ôi miền Bắc nơi lòng tôi yêu quý <br>Nơi bùng lên một chân lý: ... <br>Nơi đang dựng một thiên đường hùng vĩ <br>Nơi còn đây di chỉ của người xưa.", ans: "Bác Hồ" },
+    { id: 34, type: "fill", q: "Ba lô nặng, súng cầm tay, <br>Đường xa biết mấy ... nhớ thương. <br>Giờ này mẹ ở quê hương, <br>Cũng chừng đang dõi theo đường ta đi. (Theo Lê Anh Xuân)", ans: "dặm dài" },
+    { id: 35, type: "fill", q: "Ôi miền Bắc nơi lòng tôi yêu quý <br>Nơi bùng lên một chân lý: ... <br>Nơi đang dựng một thiên đường hùng vĩ <br>Nơi còn đây di chỉ của người xưa.", ans: "Bác Hồ" },
     { id: 36, type: "fill", q: "Điền số thích hợp vào chỗ trống: Từ các tiếng “giúp, trợ, cứu, đỡ” có thể ghép được tất cả ... từ.", ans: "4" },
     { id: 37, type: "fill", q: "Từ các tiếng “thành, kiến, hình, thức” có thể ghép được tất cả ... từ.", ans: "5" },
     { id: 38, type: "fill", q: "Từ các tiếng “khởi, động, lưu, hành” có thể ghép được tất cả ... từ.", ans: "5" },
@@ -198,63 +184,51 @@ const allQuestions = [
     { id: 56, type: "matching", q: "Ghép từ ở cột bên trái with nội dung tương ứng ở cột bên phải để tạo thành một câu hoàn chỉnh.", items: ["bình minh", "bình bầu", "bình tĩnh", "bình an"], targets: ["Muôn loài hoa đua nhau khoe sắc, tỏa hương dưới ánh ...", "Cả lớp đang ... để tìm ra “Sao chăm ngoan” tháng 3.", "Cô giáo chúc cả lớp ..., tự tin và làm bài thật tốt.", "Năm mới, con cháu chúc ông bà luôn mạnh khỏe và ..."], ans: { "bình minh": 0, "bình bầu": 1, "bình tĩnh": 2, "bình an": 3 } },
     { id: 57, type: "matching", q: "Em hãy ghép từ ở cột trái with nội dung tương ứng ở cột bên phải để tạo thành một câu hoàn chỉnh.", items: ["công cộng", "công tâm", "công lí", "công dân"], targets: ["Chúng ta cần chung tay giữ gìn vệ sinh nơi ...", "Cô giáo đã đưa ra quyết định vô cùng ..., không thiên vị bạn nào.", "Việt Nam là một dân tộc yêu chuộng hòa bình và ...", "Chúng tôi tự hào là ... của nước Việt Nam."], ans: { "công cộng": 0, "công tâm": 1, "công lí": 2, "công dân": 3 } },
     { id: 58, type: "mcq_multi", q: "Chọn từ ngữ thích hợp điền vào chỗ trống để hoàn thành đoạn văn miêu tả hình ảnh sau: <br>Bình minh, mặt trời từ từ nhô lên sau dãy núi phía xa. Những tia nắng ... hiền hòa đánh thức mọi vật tỉnh giấc. Cánh đồng lúa ... như tấm thảm mượt mà trải rộng mênh mông, từng sóng lúa ... trong gió nhẹ. Tiếng chim hót ... như khúc nhạc vui tươi đón chào ngày mới.", gaps: [
-        { label: "Số (1)", opts: ["A. hoàng hôn", "B. ban mai", "C. chiều tà"], correct: "B. ban mai" },
-        { label: "Số (2)", opts: ["A. vàng xuộm", "B. trắng phau", "C. xanh rì"], correct: "A. vàng xuộm" },
-        { label: "Số (3)", opts: ["A. dập dờn", "B. tí tách", "C. nhấp nhô"], correct: "A. dập dờn" },
-        { label: "Số (4)", opts: ["A. rì rào", "B. ì ầm", "C. líu lo"], correct: "C. líu lo" }
+        { label: "Chỗ (1)", opts: ["A. hoàng hôn", "B. ban mai", "C. chiều tà"], correct: "B. ban mai" },
+        { label: "Chỗ (2)", opts: ["A. vàng xuộm", "B. trắng phau", "C. xanh rì"], correct: "A. vàng xuộm" },
+        { label: "Chỗ (3)", opts: ["A. dập dờn", "B. tí tách", "C. nhấp nhô"], correct: "A. dập dờn" },
+        { label: "Chỗ (4)", opts: ["A. rì rào", "B. ì ầm", "C. líu lo"], correct: "C. líu lo" }
     ], img: "15s4yfuXZe-g_nB9ZnGfnf0Bp2-zDefmV" },
     { id: 59, type: "mcq_multi", q: "Chọn từ ngữ thích hợp điền vào chỗ trống để hoàn thành đoạn văn miêu tả bức tranh sau: <br>Buổi sớm, ánh nắng ... chiếu xuống, đánh thức khu rừng mùa xuân tỉnh giấc. Cây cối xanh um, những bông hoa khoe sắc rực rỡ, chim chóc đua nhau hót líu lo. Dòng ... được nắng chiếu vào, trông xa như dải lụa mềm mại, ... Tiếng suối chảy ... như bản nhạc du dương vang vọng nơi núi rừng.", gaps: [
-        { label: "Số (1)", opts: ["A. hoàng hôn", "B. ban mai", "C. xế chiều"], correct: "B. ban mai" },
-        { label: "Số (2)", opts: ["A. sông", "B. kênh", "C. thác"], correct: "C. thác" },
-        { label: "Số (3)", opts: ["A. thướt tha", "B. thẳng thắn", "C. thoang thoảng"], correct: "A. thướt tha" },
-        { label: "Số (4)", opts: ["A. lao xao", "B. róc rách", "C. lách tách"], correct: "B. róc rách" }
+        { label: "Chỗ (1)", opts: ["A. hoàng hôn", "B. ban mai", "C. xế chiều"], correct: "B. ban mai" },
+        { label: "Chỗ (2)", opts: ["A. sông", "B. kênh", "C. thác"], correct: "C. thác" },
+        { label: "Chỗ (3)", opts: ["A. thướt tha", "B. thẳng thắn", "C. thoang thoảng"], correct: "A. thướt tha" },
+        { label: "Chỗ (4)", opts: ["A. lao xao", "B. róc rách", "C. lách tách"], correct: "B. róc rách" }
     ], img: "1thhQf-Yp9YQZwf96YGPvx3sVFJW3Se79" },
     { id: 60, type: "mcq_multi", q: "Chọn từ ngữ thích hợp điền vào chỗ trống để hoàn thành đoạn văn miêu tả hình ảnh sau: <br>Buổi chiều, khung cảnh làng quê thật ... Nắng vàng đang dần lui về phía sau ngọn núi. Dòng sông nước chảy ... con thuyền nhỏ xuôi dòng về đậu bến nghỉ ngơi. Hai bên bờ, thảm lúa ... dập dờn trong gió hạ. Đàn chim ríu ran gọi bầy, ... bay về tổ trước khi trời tối.", gaps: [
-        { label: "Số (1)", opts: ["A. hoàng sơ", "B. yên bình", "C. tấp nập"], correct: "B. yên bình" },
-        { label: "Số (2)", opts: ["A. êm đềm", "B. cuồn cuộn", "C. ào ạt"], correct: "A. êm đềm" },
-        { label: "Số (3)", opts: ["A. vàng vọt", "B. vàng lịm", "C. vàng xuộm"], correct: "C. vàng xuộm" },
-        { label: "Số (4)", opts: ["A. lững thững", "B. hối hả", "C. lon ton"], correct: "B. hối hả" }
+        { label: "Chỗ (1)", opts: ["A. hoàng sơ", "B. yên bình", "C. tấp nập"], correct: "B. yên bình" },
+        { label: "Chỗ (2)", opts: ["A. êm đềm", "B. cuồn cuộn", "C. ào ạt"], correct: "A. êm đềm" },
+        { label: "Chỗ (3)", opts: ["A. vàng vọt", "B. vàng lịm", "C. vàng xuộm"], correct: "C. vàng xuộm" },
+        { label: "Chỗ (4)", opts: ["A. lững thững", "B. hối hả", "C. lon ton"], correct: "B. hối hả" }
     ], img: "1fe5LjVGMkrZrBh_w9wD-pcPBFzg91nGG" }
 ];
 
 const studentsMap = {
-    "14041989": "Phạm Văn Chiến",
+    "14041989": "Phạm Văn Chiến", 
+    "00000000": "Demo", 
     "03032015": "Phạm Nguyễn Thảo Huyền", 
     "15112015": "Đoàn Đăng Khoa", 
     "24101994": "Đặng Thị Kim Mai", 
 };
 
 // --- STATE ---
-let currentUser = null, currentAuthUser = null, examQuestions = [], currentQuestionIndex = 0, userAnswers = {}, timeLeft = 30 * 60, timerId = null;
+let currentUser = null;
+let examQuestions = [];
+let currentQuestionIndex = 0;
+let userAnswers = {};
+let timeLeft = 30 * 60;
+let timerId = null;
+let draggedItemValue = null;
 
-// --- AUTH LISTENER ---
-if (firebaseAuth) {
-    onAuthStateChanged(firebaseAuth, (user) => {
-        currentAuthUser = user;
-        if (user && currentUser) window.loadHistory();
-    });
-}
-
-// --- CORE FUNCTIONS ---
-const initAuth = async () => {
-    if (!firebaseAuth) return;
-    try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(firebaseAuth, __initial_auth_token);
-        } else {
-            await signInAnonymously(firebaseAuth);
-        }
-    } catch (e) { console.error("Xác thực lỗi:", e); }
-};
-
-window.onload = () => initAuth();
+// --- ACTIONS ---
 
 function showScreen(id) {
     document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden-screen'));
     const t = document.getElementById(id);
-    if (!t) return;
-    t.classList.remove('hidden-screen');
-    if (id === 'ready-screen' || id === 'result-screen') t.classList.add('flex');
+    if (t) {
+        t.classList.remove('hidden-screen');
+        if (id === 'ready-screen' || id === 'result-screen') t.style.display = 'flex';
+    }
 }
 
 function handleLogin() {
@@ -264,6 +238,7 @@ function handleLogin() {
         document.getElementById('display-name').textContent = currentUser.name;
         document.getElementById('welcome-msg').innerHTML = `Chào mừng em, <b>${currentUser.name}</b>!`;
         showScreen('ready-screen');
+        loadHistory();
     } else {
         document.getElementById('login-error').classList.remove('hidden');
     }
@@ -276,7 +251,7 @@ function startExam() {
     timeLeft = 30 * 60;
     renderQuestionNav(); 
     showScreen('exam-screen'); 
-    window.renderQuestion(); 
+    renderQuestion(); 
     startTimer();
 }
 
@@ -290,7 +265,7 @@ function renderQuestion() {
         html += `<div class="mb-8 flex justify-center bg-slate-50 p-4 rounded-3xl border-2 border-dashed border-slate-200">
                     <img src="https://drive.google.com/thumbnail?id=${q.img}&sz=w1000" 
                          class="max-h-80 rounded-xl shadow-lg border-2 border-white ring-1 ring-slate-200" 
-                         alt="Minh họa" onerror="this.src='https://placehold.co/600x400?text=Đang+tải+hình+ảnh...'">
+                         alt="Minh họa" onerror="this.src='https://placehold.co/600x400?text=Đang+tải+ảnh...'">
                  </div>`;
     }
 
@@ -301,7 +276,7 @@ function renderQuestion() {
         while (qText.includes("...") || qText.includes("[...]")) {
             const id = `${q.id}_gap_${gi}`;
             const target = qText.includes("[...]") ? "[...]" : "...";
-            qText = qText.replace(target, `<input type="text" class="inline-input" value="${userAnswers[id] || ''}" oninput="window.saveAnswer('${id}', this.value)" placeholder="?">`);
+            qText = qText.replace(target, `<input type="text" class="inline-input" value="${userAnswers[id] || ''}" oninput="saveAnswer('${id}', this.value)" placeholder="?">`);
             gi++;
         }
         html += `<div class="question-text text-slate-800 text-left">${qText}</div>`;
@@ -309,50 +284,50 @@ function renderQuestion() {
         html += `<div class="question-text mb-6 font-medium text-left">${q.q}</div>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-red-50 p-6 rounded-2xl border border-red-100 shadow-sm">
                     <div class="text-left"><label class="error-label">Từ viết sai:</label>
-                         <input type="text" class="w-full p-4 rounded-xl border focus:ring-2 focus:ring-red-400 outline-none" value="${userAnswers[`${q.id}_wrong`] || ''}" oninput="window.saveAnswer('${q.id}_wrong', this.value)" placeholder="VD: dọi"></div>
+                         <input type="text" class="w-full p-4 rounded-xl border focus:ring-2 focus:ring-red-400 outline-none" value="${userAnswers[`${q.id}_wrong`] || ''}" oninput="saveAnswer('${q.id}_wrong', this.value)" placeholder="VD: dọi"></div>
                     <div class="text-left"><label class="error-label">Sửa lại đúng:</label>
-                         <input type="text" class="w-full p-4 rounded-xl border focus:ring-2 focus:ring-red-400 outline-none" value="${userAnswers[`${q.id}_fixed`] || ''}" oninput="window.saveAnswer('${q.id}_fixed', this.value)" placeholder="VD: rọi"></div>
+                         <input type="text" class="w-full p-4 rounded-xl border focus:ring-2 focus:ring-red-400 outline-none" value="${userAnswers[`${q.id}_fixed`] || ''}" oninput="saveAnswer('${q.id}_fixed', this.value)" placeholder="VD: rọi"></div>
                  </div>`;
     } else if (q.type === 'mcq') {
-        html += `<div class="question-text mb-6 font-medium text-left">${q.q}</div><div class="space-y-4">`;
+        html += `<div class="question-text mb-6 font-medium text-left">${q.q}</div><div class="space-y-4 text-left">`;
         q.options.forEach(opt => {
             const ok = userAnswers[q.id] === opt;
-            html += `<label class="flex items-center p-5 border-2 rounded-2xl cursor-pointer hover:bg-blue-50 transition ${ok ? 'bg-blue-50 border-blue-500 ring-2 border-blue-200' : 'bg-white border-slate-100'}">
-                <input type="radio" name="mcq" value="${opt}" ${ok ? 'checked' : ''} class="w-6 h-6 mr-4" onchange="window.saveAnswer('${q.id}', this.value); window.renderQuestion();">
-                <span class="text-lg">${opt}</span></label>`;
+            html += `<label class="flex items-center p-5 border-2 rounded-2xl cursor-pointer hover:bg-blue-50 transition ${ok ? 'bg-blue-50 border-blue-500 ring-2' : 'bg-white border-slate-100'}">
+                <input type="radio" name="mcq" value="${opt}" ${ok ? 'checked' : ''} class="w-6 h-6 mr-4" onchange="saveAnswer('${q.id}', this.value); renderQuestion();">
+                <span class="text-lg font-medium text-left">${opt}</span></label>`;
         });
         html += `</div>`;
     } else if (q.type === 'mcq_multi') {
-        html += `<div class="question-text mb-8 font-medium text-left">${q.q}</div><div class="space-y-8">`;
+        html += `<div class="question-text mb-8 font-medium text-left">${q.q}</div><div class="space-y-8 text-left">`;
         q.gaps.forEach((g, i) => {
             const gid = `${q.id}_gap_${i}`;
-            html += `<div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm text-left">
-                <div class="font-bold text-blue-700 mb-4 text-lg">Chỗ trống ${g.label}</div>
+            html += `<div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-left">
+                <div class="font-bold text-blue-700 mb-4 text-lg text-left">${g.label}</div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">`;
             g.opts.forEach(o => {
                 const ok = userAnswers[gid] === o;
                 html += `<label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition ${ok ? 'ring-4 ring-blue-500/20 border-blue-500' : ''}">
-                    <input type="radio" name="${gid}" value="${o}" ${ok ? 'checked' : ''} onchange="window.saveAnswer('${gid}', this.value); window.renderQuestion();">
-                    <span class="ml-3 font-medium">${o}</span></label>`;
+                    <input type="radio" name="${gid}" value="${o}" ${ok ? 'checked' : ''} onchange="saveAnswer('${gid}', this.value); renderQuestion();">
+                    <span class="ml-3 font-medium text-sm text-left">${o}</span></label>`;
             });
             html += `</div></div>`;
         });
         html += `</div>`;
     } else if (q.type === 'matching') {
         html += `<div class="question-text mb-6 font-medium text-left">${q.q}</div>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
                     <div class="text-left"><h4 class="font-bold text-slate-400 text-xs uppercase mb-4 tracking-widest text-center">Cột trái (Kéo)</h4><div class="flex flex-wrap gap-3 justify-center">`;
         q.items.forEach(item => {
             let used = false; for(let k in userAnswers) if(k.startsWith(q.id + '_match_') && userAnswers[k] === item) used = true;
-            if(!used) html += `<div class="drag-item px-5 py-3 text-lg" draggable="true" ondragstart="window.handleDragStart(event, '${item}')">${item}</div>`;
+            if(!used) html += `<div class="drag-item px-5 py-3 text-lg" draggable="true" ondragstart="handleDragStart(event, '${item}')">${item}</div>`;
         });
-        html += `</div></div><div><h4 class="font-bold text-slate-400 text-xs uppercase mb-4 tracking-widest text-center">Cột phải (Thả)</h4><div class="space-y-5">`;
+        html += `</div></div><div class="text-left"><h4 class="font-bold text-slate-400 text-xs uppercase mb-4 tracking-widest text-center">Cột phải (Thả)</h4><div class="space-y-5">`;
         q.targets.forEach((t, i) => {
             const mid = `${q.id}_match_${i}`; const val = userAnswers[mid];
             html += `<div class="p-5 bg-white rounded-2xl border-2 border-slate-100 shadow-sm text-left">
-                <div class="text-slate-600 mb-3 leading-relaxed text-sm italic">${t}</div>
-                <div class="drop-zone border-slate-200" ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, '${mid}')">
-                    ${val ? `<div class="drag-item bg-blue-600 text-white border-blue-700 w-full text-center" onclick="window.removeMatch('${mid}')">${val}</div>` : '<span class="text-slate-300 text-sm italic text-center w-full block">Thả từ vào đây...</span>'}
+                <div class="text-slate-600 mb-3 leading-relaxed text-sm italic text-left">${t}</div>
+                <div class="drop-zone border-slate-200" ondragover="handleDragOver(event)" ondrop="handleDrop(event, '${mid}')">
+                    ${val ? `<div class="drag-item bg-blue-600 text-white border-blue-700 w-full text-center" onclick="removeMatch('${mid}')">${val}</div>` : '<span class="text-slate-300 text-sm italic text-center w-full block">Thả từ tương ứng vào đây...</span>'}
                 </div></div>`;
         });
         html += `</div></div></div>`;
@@ -360,6 +335,24 @@ function renderQuestion() {
     container.innerHTML = html; 
     updateNavUI();
 }
+
+function navQuestion(dir) {
+    currentQuestionIndex += dir;
+    renderQuestion();
+}
+
+function saveAnswer(id, val) {
+    userAnswers[id] = val;
+    updateNavUI();
+}
+
+function handleDragStart(e, v) { e.dataTransfer.setData('text', v); }
+function handleDragOver(e) { e.preventDefault(); }
+function handleDrop(e, id) {
+    const v = e.dataTransfer.getData('text');
+    if(v) { saveAnswer(id, v); renderQuestion(); }
+}
+function removeMatch(id) { delete userAnswers[id]; renderQuestion(); }
 
 function updateNavUI() {
     document.querySelectorAll('.question-nav-btn').forEach((btn, i) => {
@@ -386,7 +379,8 @@ function renderQuestionNav() {
     examQuestions.forEach((_, i) => {
         const b = document.createElement('button');
         b.className = 'question-nav-btn w-full aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-sm bg-white transition shadow-sm';
-        b.textContent = i + 1; b.onclick = () => { currentQuestionIndex = i; window.renderQuestion(); };
+        b.textContent = i + 1; 
+        b.onclick = () => { currentQuestionIndex = i; renderQuestion(); };
         nav.appendChild(b);
     });
 }
@@ -399,13 +393,24 @@ function startTimer() {
         const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
         const timerEl = document.getElementById('timer');
         if (timerEl) timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-        if(timeLeft <= 0) { clearInterval(timerId); window.submitExam(); }
+        if(timeLeft <= 0) { clearInterval(timerId); submitExam(); }
     }, 1000);
 }
 
+function confirmSubmit() { document.getElementById('confirm-dialog').classList.remove('hidden'); }
+function closeConfirm() { document.getElementById('confirm-dialog').classList.add('hidden'); }
+
 function submitExam() {
-    clearInterval(timerId); 
+    if (timerId) clearInterval(timerId); 
     closeConfirm();
+    
+    // Tính toán thời gian làm bài
+    const totalTimeSeconds = 30 * 60;
+    const timeSpentSeconds = totalTimeSeconds - timeLeft;
+    const spentM = Math.floor(timeSpentSeconds / 60);
+    const spentS = timeSpentSeconds % 60;
+    const timeTakenStr = `${spentM} phút ${spentS} giây`;
+
     let score = 0;
     examQuestions.forEach(q => {
         let ok = false;
@@ -420,36 +425,58 @@ function submitExam() {
         else if (q.type === 'matching') ok = q.items.every(item => userAnswers[`${q.id}_match_${q.ans[item]}`] === item);
         if (ok) score += 10;
     });
+
     document.getElementById('final-score').textContent = score;
-    document.getElementById('result-summary').textContent = `Em đã đạt ${score}/300 điểm.`;
+    document.getElementById('result-summary').textContent = `Em đã đạt ${score}/300 điểm (${score/10} câu đúng).`;
     
-    if (firebaseAuth && currentAuthUser) {
-        try { 
-            addDoc(collection(firebaseDb, 'artifacts', appId, 'public', 'data', 'results'), { 
-                studentId: currentUser.id, 
-                score, 
-                timestamp: new Date().toISOString() 
-            }); 
-            window.loadHistory(); 
-        } catch (e) {}
-    }
+    saveHistory(score, timeTakenStr);
     showScreen('result-screen');
 }
 
+// --- LƯU LỊCH SỬ VÀO TRÌNH DUYỆT (LOCAL STORAGE) ---
+function saveHistory(score, timeTaken) {
+    if (!currentUser) return;
+    const historyKey = 'exam_history_' + currentUser.id;
+    let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+    history.push({
+        score: score,
+        timeTaken: timeTaken,
+        timestamp: new Date().toISOString()
+    });
+    localStorage.setItem(historyKey, JSON.stringify(history));
+    loadHistory();
+}
+
 function loadHistory() {
-    if (!firebaseDb || !currentUser) return;
+    if (!currentUser) return;
     const list = document.getElementById('history-list');
-    onSnapshot(query(collection(firebaseDb, 'artifacts', appId, 'public', 'data', 'results')), (snap) => {
-        list.innerHTML = '';
-        snap.docs.map(d => d.data())
-            .filter(r => r.studentId === currentUser.id)
-            .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp))
-            .forEach(it => {
-                const li = document.createElement('li');
-                li.className = "flex justify-between bg-white p-5 rounded-2xl border shadow-sm";
-                li.innerHTML = `<span>📅 ${new Date(it.timestamp).toLocaleString('vi-VN')}</span> <span class="font-black text-blue-600">${it.score} điểm</span>`;
-                list.appendChild(li);
-            });
+    const historyKey = 'exam_history_' + currentUser.id;
+    let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+    
+    list.innerHTML = '';
+    if (history.length === 0) {
+        list.innerHTML = '<li class="text-slate-400 text-center py-4 italic">Em chưa có lượt thi nào được lưu trên máy này.</li>';
+        return;
+    }
+
+    history.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(it => {
+        const li = document.createElement('li');
+        li.className = "flex justify-between items-center bg-white p-5 rounded-2xl border shadow-sm";
+        li.innerHTML = `
+            <div class="flex flex-col text-left">
+                <span class="text-xs text-slate-400 uppercase font-bold tracking-widest text-left">Ngày thi</span>
+                <span class="font-medium text-slate-700 text-left">${new Date(it.timestamp).toLocaleString('vi-VN')}</span>
+            </div>
+            <div class="flex flex-col text-center">
+                <span class="text-xs text-slate-400 uppercase font-bold tracking-widest text-center">Thời gian làm</span>
+                <span class="font-medium text-slate-700 text-center">${it.timeTaken || 'N/A'}</span>
+            </div>
+            <div class="flex flex-col text-right">
+                <span class="text-xs text-slate-400 uppercase font-bold tracking-widest text-right">Điểm số</span>
+                <span class="font-black text-blue-600 text-xl text-right">${it.score} điểm</span>
+            </div>
+        `;
+        list.appendChild(li);
     });
 }
 
@@ -468,26 +495,33 @@ function showReview() {
             userVal = `Từ sai: ${w} - Sửa: ${f}`;
             const [aw, af] = q.ans.split('-').map(s=>s.trim().toLowerCase());
             isCorrect = (w.trim().toLowerCase() === aw && f.trim().toLowerCase() === af);
-        } else if(q.type === 'mcq') { userVal = userAnswers[q.id] || "(Chưa làm)"; isCorrect = (userAnswers[q.id] || "").includes(q.ans.charAt(0)); }
+        } else if(q.type === 'mcq') { userVal = userAnswers[q.id] || "(Chưa chọn)"; isCorrect = (userAnswers[q.id] || "").includes(q.ans.charAt(0)); }
         else if(q.type === 'mcq_multi') {
             userVal = q.gaps.map((_, j) => userAnswers[`${q.id}_gap_${j}`] || "?").join(" | ");
             correctVal = q.gaps.map(g => g.correct).join(" | ");
             isCorrect = q.gaps.every((g, j) => userAnswers[`${q.id}_gap_${j}`] === g.correct);
         } else if(q.type === 'matching') {
-            userVal = q.targets.map((t, j) => {
+            const up = [];
+            q.targets.forEach((t, j) => {
                 const item = userAnswers[`${q.id}_match_${j}`];
-                return item ? `[${item} ↔ ${t.substring(0, 20)}...]` : `[? ↔ ${t.substring(0, 20)}...]`;
-            }).join("<br>");
-            correctVal = q.items.map(item => `[${item} ↔ ${q.targets[q.ans[item]].substring(0, 20)}...]`).join("<br>");
+                up.push(`• [${item || '?'}] nối với [${t.substring(0, 35)}...]`);
+            });
+            userVal = up.join("<br>");
+            
+            const cp = [];
+            q.items.forEach(item => {
+                cp.push(`• [${item}] nối với [${q.targets[q.ans[item]].substring(0, 35)}...]`);
+            });
+            correctVal = cp.join("<br>");
             isCorrect = q.items.every(item => userAnswers[`${q.id}_match_${q.ans[item]}`] === item);
         }
         const d = document.createElement('div');
-        d.className = `p-8 border-l-[12px] rounded-3xl bg-white shadow-md ${isCorrect ? 'border-green-500' : 'border-red-500'}`;
-        d.innerHTML = `<div class="font-black mb-3 text-xl ${isCorrect ? 'text-green-700' : 'text-red-700'}">Câu ${i+1}: ${isCorrect ? 'ĐÚNG' : 'CHƯA ĐÚNG'}</div>
-                       <div class="mb-6 text-slate-700 leading-relaxed italic text-lg">${q.q.replace(/<input.*?>/g, "...")}</div>
-                       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="p-5 bg-slate-50 rounded-2xl border-2"><b>Bài làm:</b> <div class="mt-2 font-bold ${isCorrect?'text-green-600':'text-red-500'}">${userVal}</div></div>
-                            <div class="p-5 bg-blue-50 rounded-2xl border-2 border-blue-100"><b>Đáp án đúng:</b> <div class="mt-2 font-bold text-blue-700">${correctVal}</div></div>
+        d.className = `p-8 border-l-[12px] rounded-3xl bg-white shadow-md ${isCorrect ? 'border-green-500' : 'border-red-500'} text-left`;
+        d.innerHTML = `<div class="font-black mb-3 text-xl ${isCorrect ? 'text-green-700' : 'text-red-700'} text-left">Câu ${i+1}: ${isCorrect ? 'ĐÚNG' : 'CHƯA ĐÚNG'}</div>
+                       <div class="mb-6 text-slate-700 leading-relaxed italic text-lg text-left">${q.q.replace(/<input.*?>/g, "...")}</div>
+                       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-left">
+                            <div class="p-5 bg-slate-50 rounded-2xl border-2 text-left"><b>Bài làm của em:</b> <div class="mt-2 font-bold ${isCorrect?'text-green-600':'text-red-500'} text-left">${userVal}</div></div>
+                            <div class="p-5 bg-blue-50 rounded-2xl border-2 border-blue-100 text-left"><b>Đáp án đúng:</b> <div class="mt-2 font-bold text-blue-700 text-left">${correctVal}</div></div>
                        </div>`;
         content.appendChild(d);
     });
@@ -495,25 +529,6 @@ function showReview() {
 }
 
 function closeReview() { document.getElementById('review-modal').classList.add('hidden'); }
-function confirmSubmit() { document.getElementById('confirm-dialog').classList.remove('hidden'); }
-function closeConfirm() { document.getElementById('confirm-dialog').classList.add('hidden'); }
-
-// --- ATTACH TO WINDOW ---
-window.handleLogin = handleLogin;
-window.startExam = startExam;
-window.renderQuestion = renderQuestion;
-window.navQuestion = (dir) => { currentQuestionIndex += dir; window.renderQuestion(); };
-window.saveAnswer = (id, val) => { userAnswers[id] = val; updateNavUI(); };
-window.handleDragStart = (e, v) => e.dataTransfer.setData('text', v);
-window.handleDragOver = (e) => e.preventDefault();
-window.handleDrop = (e, id) => { const v = e.dataTransfer.getData('text'); if(v) { window.saveAnswer(id, v); window.renderQuestion(); } };
-window.removeMatch = (id) => { delete userAnswers[id]; window.renderQuestion(); };
-window.confirmSubmit = confirmSubmit;
-window.closeConfirm = closeConfirm;
-window.submitExam = submitExam;
-window.showReview = showReview;
-window.closeReview = closeReview;
-window.loadHistory = loadHistory;
 
 </script>
 </body>

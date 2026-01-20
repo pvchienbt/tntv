@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thi thử TNTV cấp Tỉnh năm 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .question-nav-btn.active { border: 3px solid #ef4444; }
+        .question-nav-btn.answered { background-color: #22c55e !important; color: white; }
+        .drop-zone { min-height: 55px; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 8px; margin-top: 8px; background: #f8fafc; transition: all 0.3s; }
+        .drag-item { cursor: grab; padding: 10px 16px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: 500; }
+        .drag-item:active { cursor: grabbing; }
+        .hidden-screen { display: none !important; }
+        .inline-input { display: inline-block; width: 100px; padding: 2px 8px; border-bottom: 2px solid #3b82f6; outline: none; text-align: center; font-weight: bold; color: #1e40af; background: #f1f5f9; border-radius: 4px; transition: all 0.2s; margin: 0 2px; }
+        .inline-input:focus { background-color: #dbeafe; border-bottom-color: #1d4ed8; transform: translateY(-1px); }
+        .question-text { line-height: 2.4; font-size: 1.15rem; }
+        .error-label { font-size: 0.8rem; font-weight: 800; color: #dc2626; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800">
+
+<div id="app" class="max-w-6xl mx-auto p-4 min-h-screen">
+    <!-- Login Screen -->
+    <div id="login-screen" class="flex flex-col items-center justify-center mt-20 bg-white p-10 rounded-2xl shadow-xl max-w-md mx-auto border border-slate-200">
+        <h1 class="text-2xl font-bold text-blue-800 mb-8 text-center uppercase tracking-tight">Thi thử TNTV cấp Tỉnh năm 2026</h1>
+        <div class="w-full mb-6">
+            <label class="block text-sm font-semibold mb-2 text-slate-600">Mã định danh của em:</label>
+            <input type="text" id="student-id" class="w-full p-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition" placeholder="Ví dụ: PVC01">
+        </div>
+        <button onclick="window.handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Đăng nhập hệ thống</button>
+        <p id="login-error" class="text-red-500 text-sm mt-4 hidden font-medium text-center">⚠️ Mã định danh không chính xác!</p>
+    </div>
+
+    <!-- Ready Screen -->
+    <div id="ready-screen" class="hidden-screen flex flex-col items-center justify-center mt-20 bg-white p-10 rounded-2xl shadow-xl max-w-md mx-auto border border-slate-200">
+        <h2 id="welcome-msg" class="text-2xl font-bold mb-4 text-center text-blue-900"></h2>
+        <div class="mb-8 p-5 bg-blue-50 rounded-xl text-center text-slate-700 space-y-2 w-full">
+            <p>Nội dung: <b>30 câu hỏi ngẫu nhiên</b></p>
+            <p>Thời gian làm bài: <b>30 phút</b></p>
+            <p>Điểm tối đa: <b>300 điểm</b></p>
+        </div>
+        <p class="mb-8 text-xl font-bold text-slate-800 text-center">Em đã sẵn sàng chưa?</p>
+        <div class="flex gap-4 w-full">
+            <button onclick="window.startExam()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">Em sẵn sàng</button>
+            <button onclick="location.reload()" class="flex-1 bg-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-300 transition">Em chưa sẵn sàng</button>
+        </div>
+    </div>
+
+    <!-- Exam Screen -->
+    <div id="exam-screen" class="hidden-screen">
+        <header class="flex flex-wrap justify-between items-center bg-white p-5 rounded-2xl shadow-md mb-6 sticky top-0 z-20 border-b-4 border-blue-600">
+            <div>
+                <h1 class="text-xl font-black text-blue-800 tracking-tight uppercase">TNTV Cấp Tỉnh 2026</h1>
+                <p class="text-sm font-medium">Học sinh: <span id="display-name" class="text-green-600 font-bold"></span></p>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-3xl font-mono font-black text-red-600 bg-red-50 px-5 py-2 rounded-xl border border-red-200" id="timer">30:00</div>
+                <button onclick="window.confirmSubmit()" class="bg-blue-600 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:bg-blue-700 transition">Nộp bài</button>
+            </div>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <div class="flex-1">
+                <div id="question-area" class="bg-white p-8 rounded-3xl shadow-sm min-h-[500px] border border-slate-200">
+                    <div id="question-container"></div>
+                </div>
+                <div class="flex justify-between mt-8">
+                    <button id="prev-btn" onclick="window.navQuestion(-1)" class="bg-white border-2 border-slate-200 px-10 py-3 rounded-2xl font-bold hover:bg-slate-50 disabled:opacity-30 transition">Câu trước</button>
+                    <button id="next-btn" onclick="window.navQuestion(1)" class="bg-white border-2 border-slate-200 px-10 py-3 rounded-2xl font-bold hover:bg-slate-50 disabled:opacity-30 transition">Câu tiếp theo</button>
+                </div>
+            </div>
+            <div class="w-full lg:w-80">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 sticky top-32">
+                    <h3 class="font-bold text-slate-500 mb-4 pb-2 border-b uppercase text-xs tracking-widest text-center">Danh sách câu hỏi</h3>
+                    <div id="question-nav" class="grid grid-cols-5 gap-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="hidden-screen flex-col items-center">
+        <div class="bg-white p-12 rounded-[2.5rem] shadow-2xl text-center max-w-2xl w-full border-t-[12px] border-blue-600">
+            <h2 class="text-3xl font-black text-slate-800 mb-2 uppercase">Kết quả thi</h2>
+            <div class="text-8xl font-black text-blue-700 mb-6" id="final-score">0</div>
+            <p id="result-summary" class="text-xl text-slate-600 mb-10 font-medium"></p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="window.showReview()" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 shadow-xl transition-all">Xem lại bài làm</button>
+                <button onclick="location.reload()" class="bg-slate-100 text-slate-700 px-10 py-4 rounded-2xl font-bold hover:bg-slate-200 transition">Thoát</button>
+            </div>
+            <div class="mt-12 text-left bg-slate-50 p-8 rounded-3xl border border-slate-200">
+                <h3 class="font-black text-slate-700 mb-5 border-b pb-2 text-sm uppercase">Lịch sử thi của em:</h3>
+                <ul id="history-list" class="space-y-3"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div id="review-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] overflow-y-auto p-4 flex items-start justify-center">
+    <div class="bg-white w-full max-w-4xl rounded-[2rem] p-10 shadow-2xl my-10 relative">
+        <button onclick="window.closeReview()" class="absolute top-6 right-8 text-5xl font-light hover:text-red-500 transition">&times;</button>
+        <h2 class="text-3xl font-black mb-10 text-blue-900 border-b pb-4 text-center">Phân tích kết quả chi tiết</h2>
+        <div id="review-content" class="space-y-12 text-left"></div>
+    </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div id="confirm-dialog" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+    <div class="bg-white p-10 rounded-[2rem] max-w-md w-full shadow-2xl text-center">
+        <h3 class="text-2xl font-black text-slate-800 mb-4 tracking-tight">Nộp bài ngay?</h3>
+        <p class="text-slate-600 mb-8">Em hãy kiểm tra kỹ các đáp án trước khi nhấn nộp bài nhé!</p>
+        <div class="flex flex-col gap-4">
+            <button onclick="window.submitExam()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200">Nộp bài ngay</button>
+            <button onclick="window.closeConfirm()" class="w-full bg-slate-100 text-slate-700 py-4 rounded-xl font-bold">Kiểm tra lại</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { getFirestore, collection, addDoc, query, onSnapshot, doc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+// --- INITIALIZE FIREBASE ---
+let firebaseApp, firebaseDb, firebaseAuth;
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'tntv-2026-v8';
+
+try {
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    if (firebaseConfig.apiKey) {
+        firebaseApp = initializeApp(firebaseConfig);
+        firebaseDb = getFirestore(firebaseApp);
+        firebaseAuth = getAuth(firebaseApp);
+    }
+} catch (e) {
+    console.error("Firebase Initialization skipped or failed", e);
+}
+
+// --- DATA CÂU HỎI ---
+const allQuestions = [
+    { id: 1, type: "fill", q: "Điền “ch” hoặc “tr” vào chỗ trống để hoàn thành đoạn thơ sau: <br>“Hai ...a con bước đi trên cát Ánh mặt ...ời rực rỡ biển xanh Bóng ...a dài lênh khênh Bóng con ...òn ...ắc nịch.” (Hoàng Trung Thông)", ans: "ch, tr, ch, tr, ch" },
+    { id: 2, type: "fill", q: "Điền “ch” hoặc “tr” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Dọc ngang biết mấy nẻo đường Thắm ...ang sử Việt, rạng ...ương anh hùng Bao nhiêu ...iến thắng lẫy lừng Làm nên Tổ quốc kiêu hùng hôm nay. (Nguyễn Lâm Thắng)", ans: "tr, ch, ch" },
+    { id: 3, type: "fill", q: "Điền “x” hoặc “s” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Chị nhảy vào ổ lá Nằm ...uống rồi đứng lên Chân ...oay tròn ...ột ...oạt Một hồi mới nằm yên", ans: "x, x, s, s" },
+    { id: 4, type: "fill", q: "Điền “r/d” hoặc “gi” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Yêu hàng ớt đã ...a hoa Đám ...ưa trổ nụ, đám cà trổ bông. Yêu sao tiếng mẹ ...u nồng, Tiếng thoi lách cách bên nong ...âu tằm. (Lê Anh Xuân)", ans: "r, d, r, d" },
+    { id: 5, type: "fill", q: "Điền “x” hoặc “s” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Mẹ ơi tóc bạc tuổi già, Cấy đêm mẹ vẫn ...ông pha chẳng ...ờn. Ngón tay bật máu mảnh bom, Cấy bao nhiêu mạ, căm hờn bấy nhiêu. (Lê Anh Xuân)", ans: "x, s" },
+    { id: 6, type: "fill", q: "Điền “r/d” hoặc “gi” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Bốn mặt quê hương ...ải phóng ...ồi Tôi bỗng thấy nội tôi trẻ lại Như thời con gái tuổi đôi mươi Như hàng ...ừa trước ngõ nhà tôi. (Lê Anh Xuân)", ans: "gi, r, d" },
+    { id: 7, type: "fill", q: "Điền “r/d” hoặc “gi” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Bờ tre cõng tiếng sáo ...iều Khúc ...ân ca lại dặt dìu lời ...u Bốn mùa là bốn câu thơ Ngọt ngào nồng ấm ...ữa bờ ca ...ao. (Theo Nguyễn Lâm Thắng)", ans: "d, d, r, gi, d" },
+    { id: 8, type: "fill", q: "Điền “ch” hoặc “tr” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Nòi ...e đâu ...ịu mọc cong Chưa lên đã nhọn như ...ông lạ thường Lưng ...ần phơi nắng phơi sương Có manh áo cộc, ...e nhường cho con. (Theo Nguyễn Duy)", ans: "tr, ch, ch, tr, tr" },
+    { id: 9, type: "fill", q: "Điền “r/d” hoặc “gi” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Việt Nam đẹp khắp trăm miền Bốn mùa một sắc trời ...iêng đất này Xóm làng, đồng ...uộng, ...ừng cây Non cao ...ó ...ựng, sông đầy nắng chang. (Theo Lê Anh Xuân)", ans: "r, r, r, gi, d" },
+    { id: 10, type: "fill", q: "Điền “ch” hoặc “tr” vào chỗ trống để hoàn thành đoạn thơ sau: <br>Đầu ...ời ngất đỉnh Hà Giang, Cà Mau mũi đất mỡ màng phù sa Trường Sơn: ...í lớn ông ...a Cửu Long: lòng mẹ bao la sóng ...ào. (Theo Lê Anh Xuân)", ans: "tr, ch, ch, tr" },
+    { id: 11, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Đêm mưa, ngày nắng xá gì, Quân thù còn đó, ta đi chưa về. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xá - sá" },
+    { id: 12, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Rừng thu trăng dọi hòa bình Nhớ ai tiếng hát ân tình thủy chung. (Theo Tố Hữu) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "dọi - rọi" },
+    { id: 13, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Em yêu nhà em Hàng xoan trước ngõ Hoa xao xuyến nở Như mây từng trùm. (Theo Tô Hà) <br>Đoạn thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "trùm - chùm" },
+    { id: 14, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Trong trắng mà chang nghiêm Hương ngát dài ngày đêm Nhớ hoa giàu ân huệ Gọi xuân về nắng lên. <br>Đoạn thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "chang - trang" },
+    { id: 15, type: "error_fix", q: "Điền từ thích hợp vào chỗ chấm: Bàn tay lao động Ta reo sự sống Trên từng đất khô; Bàn tay cần cù Mặc dù nắng cháy Khoai trồng thắm rẫy Lúa cấy xanh rừng. (Theo Hoàng Trung Thông) <br>Đoạn thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "reo - gieo" },
+    { id: 16, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Đất quê hương nát bầm vết đạn Đã nuôi dừa năm tháng xanh tươi Ôi có phải dừa hút bao cay đắng Để chổ ra những trái ngọt cho đời. (Theo Lê Anh Xuân) <br>Đoạn thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "chổ - trổ" },
+    { id: 17, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Vươn mình trong gió che đu Cây kham khổ vẫn hát ru lá cành. (Nguyễn Duy) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "che - tre" },
+    { id: 18, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Anh em cùng mẹ khác cha Cũng như cây cọ xinh ra nhiều cành. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xinh - sinh" },
+    { id: 19, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Rễ dừa bám sâu vào lòng đất Như dân làng bám trặt quê hương. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "trặt - chặt" },
+    { id: 20, type: "error_fix", q: "Điền từ thích hợp vào chỗ trống: Đây con sông xuôi dòng nước chảy Bốn mùa xoi từng mảng mây trời. (Hoài Vũ) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xoi - soi" },
+    { id: 21, type: "error_fix", q: "Tìm nơi quần đảo khơi sa Có loài hoa nở như là không tên. (Nguyễn Đức Mậu) <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "sa - xa" },
+    { id: 22, type: "error_fix", q: "Câu hát căng buồm với gió khơi Đoàn thuyền trạy đua cùng mặt trời. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "trạy - chạy" },
+    { id: 23, type: "error_fix", q: "Người ngắm trăng soi ngoài cửa xổ Trăng nhòm khe cửa ngắm nhà thơ. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "xổ - sổ" },
+    { id: 24, type: "error_fix", q: "Từ lòng khe hẹp thung xa Suối giang tay hát khúc ca hợp đồng. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "giang - dang" },
+    { id: 25, type: "error_fix", q: "Núi kia ôm chọn biển xanh Ta như hạt cát mỏng manh giữa đời. <br>Câu thơ trên có từ ... viết sai chính tả, sửa lại đúng là ...", ans: "chọn - trọn" },
+    { id: 26, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Bão bùng thân ... lấy thân <br>Tay ôm tay ... tre gần nhau thêm. <br>Thương nhau tre chẳng ở riêng, <br>Lũy thành từ đó mà nên hỡi người. (Theo Nguyễn Duy)", ans: "bọc, níu" },
+    { id: 27, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Việt Nam đất nước ta ơi! <br>Mênh mông biển ... đâu trời đẹp hơn. <br>Cánh ... bay lả rợp rờn, <br>Mây mờ che đỉnh Trường Sơn sớm chiều. (Theo Nguyễn Đình Thi)", ans: "lúa, cò" },
+    { id: 28, type: "fill", q: "Điền từ ngữ còn thiếu vào chỗ trống trong đoạn thơ sau: <br>Đây con sông như dòng sữa mẹ <br>Nước về xanh ruộng lúa vườn cây <br>Và ấm áp như lòng người mẹ <br>Chở ... trang trải đêm ngày. (Theo Hoài Vũ)", ans: "tình thương" },
+    { id: 29, type: "fill", q: "Đọc đoạn thơ sau và điền từ còn thiếu vào chỗ trống: <br>Mẹ ơi, trong lời mẹ hát <br>Có cả cuộc đời hiện ra <br>Lời ru ... con đôi cánh <br>Lớn rồi con sẽ bay xa. (Theo Trương Nam Hương)", ans: "chắp" },
+    { id: 30, type: "mcq", q: "Chọn các tiếng thích hợp lần lượt điền vào chỗ trống trong đoạn thơ sau: <br>Hà Nội mùa này lá vàng rụng đầy sân <br>Hoa [...] rơi ngập ngừng nơi gốc phố <br>Hương [...] vòng tỏa miên man nỗi nhớ <br>Thu ghé ngoài hiên, hoa [...] đượm vàng. (Theo Nguyễn Lan Hương)", options: ["A. sưa – cốm – mai", "B. ban – sen – điệp", "C. sữa – cốm – cúc"], ans: "C. sữa – cốm – cúc" },
+    { id: 31, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Yêu từng bờ ruộng, lối mòn <br>Đỏ tươi bông gạo, biếc rờn ngàn dâu <br>Yêu con sông mặt sóng xao <br>Dòng sông tuổi nhỏ rì rào ... (Theo Lê Anh Xuân)", ans: "hát ca" },
+    { id: 32, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Tôi lớn lên đã thấy dừa trước ngõ <br>Dừa ru tôi giấc ngủ ... <br>Cứ mỗi chiều nghe dừa reo trước gió <br>Tôi hỏi nội tôi: “Dừa có tự bao giờ?” (Theo Lê Anh Xuân)", ans: "tuổi thơ" },
+    { id: 33, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Rừng xa vọng tiếng chim gù, <br>Ngân nga tiếng suối, vi vu gió ngàn. <br>Mùa xuân đẫm lá ngụy trang, <br>Đường ra ... nở vàng hoa mai. (Theo Lê Anh Xuân)", ans: "tiền tuyến" },
+    { id: 34, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Ba lô nặng, súng cầm tay, <br>Đường xa biết mấy ... nhớ thương. <br>Giờ này mẹ ở quê hương, <br>Cũng chừng đang dõi theo đường ta đi. (Theo Lê Anh Xuân)", ans: "dặm dài" },
+    { id: 35, type: "fill", q: "Điền từ còn thiếu vào chỗ trống: <br>Ôi miền Bắc nơi lòng tôi yêu quý <br>Nơi bùng lên một chân lý: ... <br>Nơi đang dựng một thiên đường hùng vĩ <br>Nơi còn đây di chỉ của người xưa.", ans: "Bác Hồ" },
+    { id: 36, type: "fill", q: "Điền số thích hợp vào chỗ trống: Từ các tiếng “giúp, trợ, cứu, đỡ” có thể ghép được tất cả ... từ.", ans: "4" },
+    { id: 37, type: "fill", q: "Từ các tiếng “thành, kiến, hình, thức” có thể ghép được tất cả ... từ.", ans: "5" },
+    { id: 38, type: "fill", q: "Từ các tiếng “khởi, động, lưu, hành” có thể ghép được tất cả ... từ.", ans: "5" },
+    { id: 39, type: "fill", q: "Từ các tiếng “tĩnh, bình, yên, lặng” có thể ghép được tất cả ... từ.", ans: "8" },
+    { id: 40, type: "fill", q: "Từ các tiếng “mong, trông, chờ, ngóng” có thể ghép được tất cả ... từ.", ans: "8" },
+    { id: 41, type: "fill", q: "Từ các tiếng “phát, chế, kiến, tạo” có thể ghép được tất cả ... từ.", ans: "3" },
+    { id: 42, type: "fill", q: "Từ các tiếng “cảm, thần, tinh, thông” có thể ghép được tất cả ... từ.", ans: "5" },
+    { id: 43, type: "fill", q: "Từ các tiếng “khỏe, tâm, mạnh, sức” có thể ghép được tất cả ... từ.", ans: "5" },
+    { id: 44, type: "fill", q: "Từ các tiếng “thanh, âm, điệu, phát” có thể ghép được tất cả ... từ.", ans: "6" },
+    { id: 45, type: "fill", q: "Từ các tiếng “tiến, đồng, hành, cử, động” có thể ghép được tất cả ... từ.", ans: "6" },
+    { id: 46, type: "fill", q: "Từ các tiếng “thương, quý, mến, yêu” có thể ghép được tất cả ... từ.", ans: "8" },
+    { id: 47, type: "fill", q: "Từ các tiếng “hành, phát, ban, bảo” có thể ghép được tất cả ... từ.", ans: "6" },
+    { id: 48, type: "matching", q: "Ghép từ ở cột bên trái với nội dung thích hợp ở cột bên phải để tạo thành câu hoàn chỉnh.", items: ["thanh danh", "thanh đạm", "thanh liêm", "thanh tra"], targets: ["Những cống hiến của anh ấy làm rạng rỡ ... của cả dòng tộc.", "Bữa cơm bà nấu tuy ... nhưng chan chứa tình thương ấm áp.", "Tô Hiến Thành là một vị quan ... chính trực.", "Đầu tuần sau, trường chúng ta sẽ đón đoàn ... của tỉnh."], ans: { "thanh danh": 0, "thanh đạm": 1, "thanh liêm": 2, "thanh tra": 3 } },
+    { id: 49, type: "matching", q: "Ghép từ ở cột bên trái với nội dung thích hợp ở cột bên phải để tạo thành câu hoàn chỉnh.", items: ["phục kích", "phục trang", "phục dựng", "phục hồi"], targets: ["Đúng như dự tính, quân giặc đã nhanh chóng rơi vào trận địa ... của quân ta.", "Đoàn làm phim đã chuẩn bị kĩ lưỡng các đạo cụ và ... cho từng diễn viên.", "Bộ phim đã ... bối cảnh chiến trường trong những năm kháng chiến gian khổ, ác liệt.", "Sau một thời gian điều trị tích cực, sức khỏe của ông ấy đã dần ..."], ans: { "phục kích": 0, "phục trang": 1, "phục dựng": 2, "phục hồi": 3 } },
+    { id: 50, type: "matching", q: "Ghép từ ngữ ở cột bên trái với nội dung thích hợp ở cột bên phải để tạo thành câu hoàn chỉnh.", items: ["tâm trạng", "tâm huyết", "tâm giao", "tâm hồn"], targets: ["Mỗi khi ... không vui, cô ấy sẽ nghe những bản nhạc yêu thích.", "Cô ấy dồn hết ... để sáng tạo và phát triển dự án mới.", "Anh ấy vô cùng biết ơn và trân trọng người bạn ... của mình.", "Sách là người bạn giúp bồi đắp ... và trí tưởng tượng của trẻ nhỏ."], ans: { "tâm trạng": 0, "tâm huyết": 1, "tâm giao": 2, "tâm hồn": 3 } },
+    { id: 51, type: "matching", q: "Ghép từ ở cột bên trái with nội dung thích hợp ở cột bên phải để tạo thành câu hoàn chỉnh.", items: ["Bình đẳng", "Bình yên", "Bình tâm", "Bình phục"], targets: ["Tất cả chúng ta đều ... và cần tôn trọng nhau.", "Đối với tôi, quê ngoại thân thương luôn là nơi ... nhất.", "Anh ấy tự nhủ phải luôn ... suy xét trong những lúc nóng giận.", "Sau một thời gian tịnh dưỡng, sức khỏe của ông ấy đã dần ..."], ans: { "Bình đẳng": 0, "Bình yên": 1, "Bình tâm": 2, "Bình phục": 3 } },
+    { id: 52, type: "matching", q: "Ghép từ ở cột bên trái with nội dung thích hợp ở cột bên phải để tạo thành câu hoàn chỉnh.", items: ["an cư", "an ninh", "an khang", "an toàn"], targets: ["Sau bao năm bôn ba, anh ấy trở về quê hương để ... lạc nghiệp.", "Các chú bộ đội canh gác nơi biên cương để bảo vệ ... quốc gia.", "Đầu xuân năm mới, mọi người chúc nhau ... thịnh vượng.", "Phường em phát động phong trào “... giao thông vì hạnh phúc mọi nhà”."], ans: { "an cư": 0, "an ninh": 1, "an khang": 2, "an toàn": 3 } },
+    { id: 53, type: "matching", q: "Em hãy ghép từ ở cột trái with nội dung tương ứng ở cột bên phải để tạo thành một câu hoàn chỉnh.", items: ["công nhận", "công ước", "công bằng", "công ích"], targets: ["Những bằng chứng luật sư đưa ra không được thẩm phán ...", "Các quốc gia đều tuân thủ ... của Liên hợp quốc về quyền trẻ em.", "Chúng tôi sẽ giải quyết sự vụ một cách ... và nghiêm minh.", "Bảo Trâm cùng các bạn tham gia hoạt động ..."], ans: { "công nhận": 0, "công ước": 1, "công bằng": 2, "công ích": 3 } },
+    { id: 54, type: "matching", q: "Nối từ ngữ ở cột trái with nội dung tương ứng ở cột phải để tạo thành một câu hoàn chỉnh.", items: ["thanh tĩnh", "thanh bình", "thanh tú", "thanh lịch"], targets: ["Đêm khuya, không gian ... khiến tôi dần chìm vào giấc ngủ.", "Bất cứ ai cũng mong muốn có được một cuộc sống ..., yên vui.", "Nụ cười rạng rỡ cùng khuôn mặt ... của cô ấy đã để lại ấn tượng sâu đậm trong trái tôi.", "Ông bà tôi luôn giữ gìn nếp sống ... của con người Hà Nội."], ans: { "thanh tĩnh": 0, "thanh bình": 1, "thanh tú": 2, "thanh lịch": 3 } },
+    { id: 55, type: "matching", q: "Ghép từ ở cột bên trái with nội dung tương ứng ở cột bên phải để tạo thành một câu hoàn chỉnh.", items: ["tài trí", "tài đức", "tài năng", "tài hoa"], targets: ["Bằng ... hơn người, anh ấy đã suy luận ra những điểm khác thường mà không ai phát hiện được.", "Thủ lĩnh của chúng tôi là một người ... song toàn.", "Học viện thanh nhạc đã phát hiện và bồi dưỡng ... của Hồng Anh.", "Người đến xem triển lãm không khỏi trầm trồ trước những nét chạm trổ ... của các nghệ nhân."], ans: { "tài trí": 0, "tài đức": 1, "tài năng": 2, "tài hoa": 3 } },
+    { id: 56, type: "matching", q: "Ghép từ ở cột bên trái with nội dung tương ứng ở cột bên phải để tạo thành một câu hoàn chỉnh.", items: ["bình minh", "bình bầu", "bình tĩnh", "bình an"], targets: ["Muôn loài hoa đua nhau khoe sắc, tỏa hương dưới ánh ...", "Cả lớp đang ... để tìm ra “Sao chăm ngoan” tháng 3.", "Cô giáo chúc cả lớp ..., tự tin và làm bài thật tốt.", "Năm mới, con cháu chúc ông bà luôn mạnh khỏe và ..."], ans: { "bình minh": 0, "bình bầu": 1, "bình tĩnh": 2, "bình an": 3 } },
+    { id: 57, type: "matching", q: "Em hãy ghép từ ở cột trái with nội dung tương ứng ở cột bên phải để tạo thành một câu hoàn chỉnh.", items: ["công cộng", "công tâm", "công lí", "công dân"], targets: ["Chúng ta cần chung tay giữ gìn vệ sinh nơi ...", "Cô giáo đã đưa ra quyết định vô cùng ..., không thiên vị bạn nào.", "Việt Nam là một dân tộc yêu chuộng hòa bình và ...", "Chúng tôi tự hào là ... của nước Việt Nam."], ans: { "công cộng": 0, "công tâm": 1, "công lí": 2, "công dân": 3 } },
+    { id: 58, type: "mcq_multi", q: "Chọn từ ngữ thích hợp điền vào chỗ trống để hoàn thành đoạn văn miêu tả hình ảnh sau: <br>Bình minh, mặt trời từ từ nhô lên sau dãy núi phía xa. Những tia nắng ... hiền hòa đánh thức mọi vật tỉnh giấc. Cánh đồng lúa ... như tấm thảm mượt mà trải rộng mênh mông, từng sóng lúa ... trong gió nhẹ. Tiếng chim hót ... như khúc nhạc vui tươi đón chào ngày mới.", gaps: [
+        { label: "Số (1)", opts: ["A. hoàng hôn", "B. ban mai", "C. chiều tà"], correct: "B. ban mai" },
+        { label: "Số (2)", opts: ["A. vàng xuộm", "B. trắng phau", "C. xanh rì"], correct: "A. vàng xuộm" },
+        { label: "Số (3)", opts: ["A. dập dờn", "B. tí tách", "C. nhấp nhô"], correct: "A. dập dờn" },
+        { label: "Số (4)", opts: ["A. rì rào", "B. ì ầm", "C. líu lo"], correct: "C. líu lo" }
+    ], img: "15s4yfuXZe-g_nB9ZnGfnf0Bp2-zDefmV" },
+    { id: 59, type: "mcq_multi", q: "Chọn từ ngữ thích hợp điền vào chỗ trống để hoàn thành đoạn văn miêu tả bức tranh sau: <br>Buổi sớm, ánh nắng ... chiếu xuống, đánh thức khu rừng mùa xuân tỉnh giấc. Cây cối xanh um, những bông hoa khoe sắc rực rỡ, chim chóc đua nhau hót líu lo. Dòng ... được nắng chiếu vào, trông xa như dải lụa mềm mại, ... Tiếng suối chảy ... như bản nhạc du dương vang vọng nơi núi rừng.", gaps: [
+        { label: "Số (1)", opts: ["A. hoàng hôn", "B. ban mai", "C. xế chiều"], correct: "B. ban mai" },
+        { label: "Số (2)", opts: ["A. sông", "B. kênh", "C. thác"], correct: "C. thác" },
+        { label: "Số (3)", opts: ["A. thướt tha", "B. thẳng thắn", "C. thoang thoảng"], correct: "A. thướt tha" },
+        { label: "Số (4)", opts: ["A. lao xao", "B. róc rách", "C. lách tách"], correct: "B. róc rách" }
+    ], img: "1thhQf-Yp9YQZwf96YGPvx3sVFJW3Se79" },
+    { id: 60, type: "mcq_multi", q: "Chọn từ ngữ thích hợp điền vào chỗ trống để hoàn thành đoạn văn miêu tả hình ảnh sau: <br>Buổi chiều, khung cảnh làng quê thật ... Nắng vàng đang dần lui về phía sau ngọn núi. Dòng sông nước chảy ... con thuyền nhỏ xuôi dòng về đậu bến nghỉ ngơi. Hai bên bờ, thảm lúa ... dập dờn trong gió hạ. Đàn chim ríu ran gọi bầy, ... bay về tổ trước khi trời tối.", gaps: [
+        { label: "Số (1)", opts: ["A. hoàng sơ", "B. yên bình", "C. tấp nập"], correct: "B. yên bình" },
+        { label: "Số (2)", opts: ["A. êm đềm", "B. cuồn cuộn", "C. ào ạt"], correct: "A. êm đềm" },
+        { label: "Số (3)", opts: ["A. vàng vọt", "B. vàng lịm", "C. vàng xuộm"], correct: "C. vàng xuộm" },
+        { label: "Số (4)", opts: ["A. lững thững", "B. hối hả", "C. lon ton"], correct: "B. hối hả" }
+    ], img: "1fe5LjVGMkrZrBh_w9wD-pcPBFzg91nGG" }
+];
+
+const studentsMap = {
+    "PVC01": "Phạm Văn Chiến", "PVC02": "Phạm Văn Chiến", "PVC03": "Phạm Văn Chiến", "PVC04": "Phạm Văn Chiến", "PVC05": "Phạm Văn Chiến",
+    "PNTH01": "Phạm Nguyễn Thảo Huyền", "PNTH02": "Phạm Nguyễn Thảo Huyền", "PNTH03": "Phạm Nguyễn Thảo Huyền", "PNTH04": "Phạm Nguyễn Thảo Huyền",
+    "DDK01": "Đoàn Đăng Khoa", "DDK02": "Đoàn Đăng Khoa", "DDK03": "Đoàn Đăng Khoa", "DDK04": "Đoàn Đăng Khoa",
+    "DTKM01": "Đặng Thị Kim Mai", "DTKM02": "Đặng Thị Kim Mai", "DTKM03": "Đặng Thị Kim Mai", "DTKM04": "Đặng Thị Kim Mai", "DTKM05": "Đặng Thị Kim Mai"
+};
+
+// --- STATE ---
+let currentUser = null, currentAuthUser = null, examQuestions = [], currentQuestionIndex = 0, userAnswers = {}, timeLeft = 30 * 60, timerId = null;
+
+// --- AUTH LISTENER ---
+if (firebaseAuth) {
+    onAuthStateChanged(firebaseAuth, (user) => {
+        currentAuthUser = user;
+        if (user && currentUser) window.loadHistory();
+    });
+}
+
+// --- CORE FUNCTIONS ---
+const initAuth = async () => {
+    if (!firebaseAuth) return;
+    try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(firebaseAuth, __initial_auth_token);
+        } else {
+            await signInAnonymously(firebaseAuth);
+        }
+    } catch (e) { console.error("Xác thực lỗi:", e); }
+};
+
+window.onload = () => initAuth();
+
+function showScreen(id) {
+    document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden-screen'));
+    const t = document.getElementById(id);
+    if (!t) return;
+    t.classList.remove('hidden-screen');
+    if (id === 'ready-screen' || id === 'result-screen') t.classList.add('flex');
+}
+
+function handleLogin() {
+    const id = document.getElementById('student-id').value.toUpperCase().trim();
+    if (studentsMap[id]) {
+        currentUser = { id, name: studentsMap[id] };
+        document.getElementById('display-name').textContent = currentUser.name;
+        document.getElementById('welcome-msg').innerHTML = `Chào mừng em, <b>${currentUser.name}</b>!`;
+        showScreen('ready-screen');
+    } else {
+        document.getElementById('login-error').classList.remove('hidden');
+    }
+}
+
+function startExam() {
+    examQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 30);
+    userAnswers = {}; 
+    currentQuestionIndex = 0; 
+    timeLeft = 30 * 60;
+    renderQuestionNav(); 
+    showScreen('exam-screen'); 
+    window.renderQuestion(); 
+    startTimer();
+}
+
+function renderQuestion() {
+    const q = examQuestions[currentQuestionIndex]; 
+    if (!q) return;
+    const container = document.getElementById('question-container');
+    let html = '';
+    
+    if (q.img) {
+        html += `<div class="mb-8 flex justify-center bg-slate-50 p-4 rounded-3xl border-2 border-dashed border-slate-200">
+                    <img src="https://drive.google.com/thumbnail?id=${q.img}&sz=w1000" 
+                         class="max-h-80 rounded-xl shadow-lg border-2 border-white ring-1 ring-slate-200" 
+                         alt="Minh họa" onerror="this.src='https://placehold.co/600x400?text=Đang+tải+hình+ảnh...'">
+                 </div>`;
+    }
+
+    html += `<div class="mb-6 text-sm font-bold text-blue-500 uppercase tracking-widest text-left">Câu hỏi ${currentQuestionIndex + 1} / 30</div>`;
+
+    if (q.type === 'fill') {
+        let qText = q.q; let gi = 0;
+        while (qText.includes("...") || qText.includes("[...]")) {
+            const id = `${q.id}_gap_${gi}`;
+            const target = qText.includes("[...]") ? "[...]" : "...";
+            qText = qText.replace(target, `<input type="text" class="inline-input" value="${userAnswers[id] || ''}" oninput="window.saveAnswer('${id}', this.value)" placeholder="?">`);
+            gi++;
+        }
+        html += `<div class="question-text text-slate-800 text-left">${qText}</div>`;
+    } else if (q.type === 'error_fix') {
+        html += `<div class="question-text mb-6 font-medium text-left">${q.q}</div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-red-50 p-6 rounded-2xl border border-red-100 shadow-sm">
+                    <div class="text-left"><label class="error-label">Từ viết sai:</label>
+                         <input type="text" class="w-full p-4 rounded-xl border focus:ring-2 focus:ring-red-400 outline-none" value="${userAnswers[`${q.id}_wrong`] || ''}" oninput="window.saveAnswer('${q.id}_wrong', this.value)" placeholder="VD: dọi"></div>
+                    <div class="text-left"><label class="error-label">Sửa lại đúng:</label>
+                         <input type="text" class="w-full p-4 rounded-xl border focus:ring-2 focus:ring-red-400 outline-none" value="${userAnswers[`${q.id}_fixed`] || ''}" oninput="window.saveAnswer('${q.id}_fixed', this.value)" placeholder="VD: rọi"></div>
+                 </div>`;
+    } else if (q.type === 'mcq') {
+        html += `<div class="question-text mb-6 font-medium text-left">${q.q}</div><div class="space-y-4">`;
+        q.options.forEach(opt => {
+            const ok = userAnswers[q.id] === opt;
+            html += `<label class="flex items-center p-5 border-2 rounded-2xl cursor-pointer hover:bg-blue-50 transition ${ok ? 'bg-blue-50 border-blue-500 ring-2 border-blue-200' : 'bg-white border-slate-100'}">
+                <input type="radio" name="mcq" value="${opt}" ${ok ? 'checked' : ''} class="w-6 h-6 mr-4" onchange="window.saveAnswer('${q.id}', this.value); window.renderQuestion();">
+                <span class="text-lg">${opt}</span></label>`;
+        });
+        html += `</div>`;
+    } else if (q.type === 'mcq_multi') {
+        html += `<div class="question-text mb-8 font-medium text-left">${q.q}</div><div class="space-y-8">`;
+        q.gaps.forEach((g, i) => {
+            const gid = `${q.id}_gap_${i}`;
+            html += `<div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm text-left">
+                <div class="font-bold text-blue-700 mb-4 text-lg">Chỗ trống ${g.label}</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">`;
+            g.opts.forEach(o => {
+                const ok = userAnswers[gid] === o;
+                html += `<label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition ${ok ? 'ring-4 ring-blue-500/20 border-blue-500' : ''}">
+                    <input type="radio" name="${gid}" value="${o}" ${ok ? 'checked' : ''} onchange="window.saveAnswer('${gid}', this.value); window.renderQuestion();">
+                    <span class="ml-3 font-medium">${o}</span></label>`;
+            });
+            html += `</div></div>`;
+        });
+        html += `</div>`;
+    } else if (q.type === 'matching') {
+        html += `<div class="question-text mb-6 font-medium text-left">${q.q}</div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="text-left"><h4 class="font-bold text-slate-400 text-xs uppercase mb-4 tracking-widest text-center">Cột trái (Kéo)</h4><div class="flex flex-wrap gap-3 justify-center">`;
+        q.items.forEach(item => {
+            let used = false; for(let k in userAnswers) if(k.startsWith(q.id + '_match_') && userAnswers[k] === item) used = true;
+            if(!used) html += `<div class="drag-item px-5 py-3 text-lg" draggable="true" ondragstart="window.handleDragStart(event, '${item}')">${item}</div>`;
+        });
+        html += `</div></div><div><h4 class="font-bold text-slate-400 text-xs uppercase mb-4 tracking-widest text-center">Cột phải (Thả)</h4><div class="space-y-5">`;
+        q.targets.forEach((t, i) => {
+            const mid = `${q.id}_match_${i}`; const val = userAnswers[mid];
+            html += `<div class="p-5 bg-white rounded-2xl border-2 border-slate-100 shadow-sm text-left">
+                <div class="text-slate-600 mb-3 leading-relaxed text-sm italic">${t}</div>
+                <div class="drop-zone border-slate-200" ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, '${mid}')">
+                    ${val ? `<div class="drag-item bg-blue-600 text-white border-blue-700 w-full text-center" onclick="window.removeMatch('${mid}')">${val}</div>` : '<span class="text-slate-300 text-sm italic text-center w-full block">Thả từ vào đây...</span>'}
+                </div></div>`;
+        });
+        html += `</div></div></div>`;
+    }
+    container.innerHTML = html; 
+    updateNavUI();
+}
+
+function updateNavUI() {
+    document.querySelectorAll('.question-nav-btn').forEach((btn, i) => {
+        const q = examQuestions[i]; if (!q) return;
+        btn.classList.toggle('active', i === currentQuestionIndex);
+        let done = false;
+        if(q.type === 'fill') done = (q.q.match(/\.\.\.|\{\.\.\.\}/g) || []).every((_, gi) => !!userAnswers[`${q.id}_gap_${gi}`]);
+        else if(q.type === 'error_fix') done = (!!userAnswers[`${q.id}_wrong`] && !!userAnswers[`${q.id}_fixed`]);
+        else if(q.type === 'mcq_multi') done = q.gaps.every((_, gi) => !!userAnswers[`${q.id}_gap_${gi}`]);
+        else if(q.type === 'matching') done = q.targets.every((_, ti) => !!userAnswers[`${q.id}_match_${ti}`]);
+        else done = !!userAnswers[q.id];
+        btn.classList.toggle('answered', done);
+    });
+    const pBtn = document.getElementById('prev-btn');
+    const nBtn = document.getElementById('next-btn');
+    if(pBtn) pBtn.disabled = currentQuestionIndex === 0;
+    if(nBtn) nBtn.disabled = currentQuestionIndex === examQuestions.length - 1;
+}
+
+function renderQuestionNav() {
+    const nav = document.getElementById('question-nav'); 
+    if (!nav) return;
+    nav.innerHTML = '';
+    examQuestions.forEach((_, i) => {
+        const b = document.createElement('button');
+        b.className = 'question-nav-btn w-full aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-sm bg-white transition shadow-sm';
+        b.textContent = i + 1; b.onclick = () => { currentQuestionIndex = i; window.renderQuestion(); };
+        nav.appendChild(b);
+    });
+}
+
+function startTimer() {
+    if (timerId) clearInterval(timerId); 
+    timeLeft = 30 * 60;
+    timerId = setInterval(() => {
+        timeLeft--; 
+        const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+        const timerEl = document.getElementById('timer');
+        if (timerEl) timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        if(timeLeft <= 0) { clearInterval(timerId); window.submitExam(); }
+    }, 1000);
+}
+
+function submitExam() {
+    clearInterval(timerId); 
+    closeConfirm();
+    let score = 0;
+    examQuestions.forEach(q => {
+        let ok = false;
+        if (q.type === 'fill') {
+            const cp = q.ans.split(',').map(s => s.trim().toLowerCase());
+            ok = cp.every((p, i) => (userAnswers[`${q.id}_gap_${i}`] || '').trim().toLowerCase() === p);
+        } else if (q.type === 'error_fix') {
+            const [aw, af] = q.ans.split('-').map(s => s.trim().toLowerCase());
+            ok = ((userAnswers[`${q.id}_wrong`] || '').trim().toLowerCase() === aw && (userAnswers[`${q.id}_fixed`] || '').trim().toLowerCase() === af);
+        } else if (q.type === 'mcq') ok = (userAnswers[q.id] || '').includes(q.ans.charAt(0));
+        else if (q.type === 'mcq_multi') ok = q.gaps.every((g, i) => userAnswers[`${q.id}_gap_${i}`] === g.correct);
+        else if (q.type === 'matching') ok = q.items.every(item => userAnswers[`${q.id}_match_${q.ans[item]}`] === item);
+        if (ok) score += 10;
+    });
+    document.getElementById('final-score').textContent = score;
+    document.getElementById('result-summary').textContent = `Em đã đạt ${score}/300 điểm.`;
+    
+    if (firebaseAuth && currentAuthUser) {
+        try { 
+            addDoc(collection(firebaseDb, 'artifacts', appId, 'public', 'data', 'results'), { 
+                studentId: currentUser.id, 
+                score, 
+                timestamp: new Date().toISOString() 
+            }); 
+            window.loadHistory(); 
+        } catch (e) {}
+    }
+    showScreen('result-screen');
+}
+
+function loadHistory() {
+    if (!firebaseDb || !currentUser) return;
+    const list = document.getElementById('history-list');
+    onSnapshot(query(collection(firebaseDb, 'artifacts', appId, 'public', 'data', 'results')), (snap) => {
+        list.innerHTML = '';
+        snap.docs.map(d => d.data())
+            .filter(r => r.studentId === currentUser.id)
+            .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp))
+            .forEach(it => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between bg-white p-5 rounded-2xl border shadow-sm";
+                li.innerHTML = `<span>📅 ${new Date(it.timestamp).toLocaleString('vi-VN')}</span> <span class="font-black text-blue-600">${it.score} điểm</span>`;
+                list.appendChild(li);
+            });
+    });
+}
+
+function showReview() {
+    const content = document.getElementById('review-content'); 
+    content.innerHTML = '';
+    examQuestions.forEach((q, i) => {
+        let isCorrect = false, userVal = "", correctVal = q.ans;
+        if(q.type === 'fill') {
+            const gc = (q.q.match(/\.\.\.|\{\.\.\.\}/g) || []).length;
+            const up = []; for(let j=0; j<gc; j++) up.push(userAnswers[`${q.id}_gap_${j}`] || "?");
+            userVal = up.join(", ");
+            isCorrect = q.ans.split(',').map(s=>s.trim().toLowerCase()).every((p, j) => (userAnswers[`${q.id}_gap_${j}`] || '').trim().toLowerCase() === p);
+        } else if(q.type === 'error_fix') {
+            const w = userAnswers[`${q.id}_wrong`] || "?", f = userAnswers[`${q.id}_fixed`] || "?";
+            userVal = `Từ sai: ${w} - Sửa: ${f}`;
+            const [aw, af] = q.ans.split('-').map(s=>s.trim().toLowerCase());
+            isCorrect = (w.trim().toLowerCase() === aw && f.trim().toLowerCase() === af);
+        } else if(q.type === 'mcq') { userVal = userAnswers[q.id] || "(Chưa làm)"; isCorrect = (userAnswers[q.id] || "").includes(q.ans.charAt(0)); }
+        else if(q.type === 'mcq_multi') {
+            userVal = q.gaps.map((_, j) => userAnswers[`${q.id}_gap_${j}`] || "?").join(" | ");
+            correctVal = q.gaps.map(g => g.correct).join(" | ");
+            isCorrect = q.gaps.every((g, j) => userAnswers[`${q.id}_gap_${j}`] === g.correct);
+        } else if(q.type === 'matching') {
+            userVal = q.targets.map((t, j) => {
+                const item = userAnswers[`${q.id}_match_${j}`];
+                return item ? `[${item} ↔ ${t.substring(0, 20)}...]` : `[? ↔ ${t.substring(0, 20)}...]`;
+            }).join("<br>");
+            correctVal = q.items.map(item => `[${item} ↔ ${q.targets[q.ans[item]].substring(0, 20)}...]`).join("<br>");
+            isCorrect = q.items.every(item => userAnswers[`${q.id}_match_${q.ans[item]}`] === item);
+        }
+        const d = document.createElement('div');
+        d.className = `p-8 border-l-[12px] rounded-3xl bg-white shadow-md ${isCorrect ? 'border-green-500' : 'border-red-500'}`;
+        d.innerHTML = `<div class="font-black mb-3 text-xl ${isCorrect ? 'text-green-700' : 'text-red-700'}">Câu ${i+1}: ${isCorrect ? 'ĐÚNG' : 'CHƯA ĐÚNG'}</div>
+                       <div class="mb-6 text-slate-700 leading-relaxed italic text-lg">${q.q.replace(/<input.*?>/g, "...")}</div>
+                       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-5 bg-slate-50 rounded-2xl border-2"><b>Bài làm:</b> <div class="mt-2 font-bold ${isCorrect?'text-green-600':'text-red-500'}">${userVal}</div></div>
+                            <div class="p-5 bg-blue-50 rounded-2xl border-2 border-blue-100"><b>Đáp án đúng:</b> <div class="mt-2 font-bold text-blue-700">${correctVal}</div></div>
+                       </div>`;
+        content.appendChild(d);
+    });
+    document.getElementById('review-modal').classList.remove('hidden');
+}
+
+function closeReview() { document.getElementById('review-modal').classList.add('hidden'); }
+function confirmSubmit() { document.getElementById('confirm-dialog').classList.remove('hidden'); }
+function closeConfirm() { document.getElementById('confirm-dialog').classList.add('hidden'); }
+
+// --- ATTACH TO WINDOW ---
+window.handleLogin = handleLogin;
+window.startExam = startExam;
+window.renderQuestion = renderQuestion;
+window.navQuestion = (dir) => { currentQuestionIndex += dir; window.renderQuestion(); };
+window.saveAnswer = (id, val) => { userAnswers[id] = val; updateNavUI(); };
+window.handleDragStart = (e, v) => e.dataTransfer.setData('text', v);
+window.handleDragOver = (e) => e.preventDefault();
+window.handleDrop = (e, id) => { const v = e.dataTransfer.getData('text'); if(v) { window.saveAnswer(id, v); window.renderQuestion(); } };
+window.removeMatch = (id) => { delete userAnswers[id]; window.renderQuestion(); };
+window.confirmSubmit = confirmSubmit;
+window.closeConfirm = closeConfirm;
+window.submitExam = submitExam;
+window.showReview = showReview;
+window.closeReview = closeReview;
+window.loadHistory = loadHistory;
+
+</script>
+</body>
+</html>
